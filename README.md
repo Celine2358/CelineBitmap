@@ -16,8 +16,6 @@ C#과 Avalonia UI, OpenCvSharp5를 이용해 제작하는
 - Color Quantization과 Dithering
 - Pixel Art 변환 알고리즘
 - Avalonia UI와 OpenCV 이미지 데이터 연결
-- MVVM 기반 데스크톱 애플리케이션 구조
-- Git / GitHub Desktop을 이용한 프로젝트 버전 관리
 
 ---
 
