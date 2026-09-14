@@ -30,9 +30,9 @@ public static class ImageProcessor
     }
 
     /// <summary>
-    /// 이미지의 크기를 변경한다
+    /// 지정한 보간법으로 이미지의 크기를 변경한다
     /// </summary>
-    public static Mat Resize(Mat source, int width, int height, bool pixelArt = false)
+    public static Mat Resize(Mat source, int width, int height, InterpolationFlags interpolation)
     {
         if (source.Empty())
         {
@@ -46,6 +46,7 @@ public static class ImageProcessor
             throw new ArgumentOutOfRangeException(nameof(width), "Width와 Height는 1 이상이어야 합니다.");
         }
 
+        // 결과 이미지를 담은 새로운 Mat
         var result = new Mat();
 
         // Pixel Art: 가장 가까운 픽셀을 그대로 복제한다
@@ -54,25 +55,7 @@ public static class ImageProcessor
         // 일반 이미지 확대: Lanczos4를 사용해 주변 픽셀을 계산한다
         // 일반 이미지 축소: Area가 축소에 비교적 적합할 듯
 
-        // 변수: 어떤 보간법을 사용할까?
-        InterpolationFlags interpolation;
-
-        if (pixelArt)
-        {
-            // 인접
-            interpolation = InterpolationFlags.Nearest;
-        }
-        else if (width < source.Width || height < source.Height)
-        {
-            interpolation = InterpolationFlags.Area;
-        }
-        else
-        {
-            interpolation = InterpolationFlags.Lanczos4;
-        }
-
         Cv2.Resize(source, result, new Size(width, height), 0, 0, interpolation);
-
         return result;
     }
 
@@ -82,14 +65,20 @@ public static class ImageProcessor
         return image.ToWriteableBitmap();
     }
 
-    // Mat을 PNG/JPG 등의 이미지 파일로 저장한다.
+    /// <summary>
+    /// 처리된 Mat을 PNG/JPG 등의 파일로 저장한다.
+    /// </summary>
     public static void Save(Mat image, string path)
     {
+        if (image.Empty())
+        {
+            throw new ArgumentException("저장할 이미지가 비어 있습니다.", nameof(image));
+        }
+
         bool success = Cv2.ImWrite(path, image);
 
         if (!success)
         {
-            // 파일 경로에 문제가 생겼을 때
             throw new IOException($"이미지를 저장하지 못했습니다: {path}");
         }
     }
