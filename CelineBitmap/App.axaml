@@ -1,0 +1,51 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="CelineBitmap.App"
+             xmlns:local="using:CelineBitmap"
+             RequestedThemeVariant="Light">
+
+    <Application.DataTemplates>
+        <local:ViewLocator/>
+    </Application.DataTemplates>
+
+    <Application.Resources>
+
+        <!-- Celine Bitmap Font -->
+        <FontFamily x:Key="CelineFont">
+            avares://CelineBitmap/Assets/Fonts/Galmuri9.ttf#Galmuri9
+        </FontFamily>
+
+        <!-- Celine Palette -->
+        <SolidColorBrush x:Key="CelineBackgroundBrush" Color="#F8FBFF"/>
+        <SolidColorBrush x:Key="CelinePanelBrush" Color="#FFFFFF"/>
+        <SolidColorBrush x:Key="CelineBorderBrush" Color="#DCE8F4"/>
+        <SolidColorBrush x:Key="CelinePrimaryBrush" Color="#6A9FD8"/>
+        <SolidColorBrush x:Key="CelineTextBrush" Color="#263E57"/>
+        <SolidColorBrush x:Key="CelineSubTextBrush" Color="#71879D"/>
+
+    </Application.Resources>
+
+    <Application.Styles>
+        <FluentTheme />
+
+        <!-- App-wide font -->
+        <Style Selector="Window">
+            <Setter Property="FontFamily" Value="{StaticResource CelineFont}"/>
+        </Style>
+
+        <Style Selector="Button">
+            <Setter Property="FontFamily" Value="{StaticResource CelineFont}"/>
+            <Setter Property="Padding" Value="16,9"/>
+        </Style>
+
+        <Style Selector="TextBox">
+            <Setter Property="FontFamily" Value="{StaticResource CelineFont}"/>
+        </Style>
+
+        <Style Selector="ComboBox">
+            <Setter Property="FontFamily" Value="{StaticResource CelineFont}"/>
+        </Style>
+
+    </Application.Styles>
+
+</Application>

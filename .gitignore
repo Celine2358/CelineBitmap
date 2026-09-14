@@ -399,3 +399,27 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+
+
+# ==================================================
+# Celine Bitmap
+# ==================================================
+
+# Generated image output
+Output/
+Outputs/
+Exports/
+
+# Temporary image processing files
+TempImages/
+Cache/
+
+# Local test files that should not be uploaded
+TestImages/Private/
+
+# Windows Explorer
+Thumbs.db
+Desktop.ini
+
+# macOS, in case the repository is opened elsewhere
+.DS_Store
