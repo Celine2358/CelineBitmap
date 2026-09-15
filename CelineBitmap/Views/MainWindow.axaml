@@ -44,7 +44,7 @@
                             VerticalAlignment="Center">
                     
                     <Button Content="이미지 열기" Click="OpenImageButton_Click"/>
-                    <Button x:Name="SaveImageButton" Content="이미지 저장" Click="SaveImageButton_Click" IsEnabled="False"/>
+                    <Button x:Name="SaveImageButton" Content="이미지 저장" Click="SaveImageButton_Click" IsEnabled="True"/>
                 </StackPanel>
             </Grid>
         </Border>
@@ -281,6 +281,36 @@
                                           Content="Edge"
                                           Click="FilterToggle_Click"/>
                         </WrapPanel>
+
+                        <Border Height="1" Margin="0,8"
+                                Background="{StaticResource CelineBorderBrush}"/>
+                        
+                        <TextBlock Text="픽셀아트(Pixel Art)" FontSize="14" FontWeight="SemiBold"
+                                   Foreground="{StaticResource CelineTextBrush}"/>
+                        
+                        <TextBlock Text="픽셀 해상도"
+                                   Foreground="{StaticResource CelineSubTextBrush}"/>
+                        
+                        <NumericUpDown x:Name="PixelWidthInput"
+                                       Minimum="16"
+                                       Maximum="512"
+                                       Value="96"/>
+                        
+                        <TextBlock Text="Palette Colors"
+                                   Foreground="{StaticResource CelineSubTextBrush}"/>
+                        
+                        <ComboBox x:Name="PaletteColorCombo" SelectedIndex="2">
+                            <ComboBoxItem Content="8"/>
+                            <ComboBoxItem Content="16"/>
+                            <ComboBoxItem Content="32"/>
+                            <ComboBoxItem Content="64"/>
+                        </ComboBox>
+                        
+                        <CheckBox x:Name="PixelSmoothCheckBox"
+                                  Content="경계를 보존하는 부드러움(Edge-preserving smoothing)"
+                                  IsChecked="True"/>
+                        
+                        <Button Content="Pixel Art 변환" Click="PixelArtButton_Click"/>
                     </StackPanel>
                 </ScrollViewer>
             </Border>

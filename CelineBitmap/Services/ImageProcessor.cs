@@ -9,6 +9,10 @@ namespace CelineBitmap.Services;
 // Mat: 이미지나 행렬의 픽셀 데이터를 저장/관리하는 OpenCV 핵심 자료구조
 // Cv2: OpenCV의 이미지 처리 함수들을 제공하는 static 클래스
 // Size: Width와 Height를 표현하는 구조체
+
+/// <summary>
+/// 일반적인 이미지 처리 기능
+/// </summary>
 public static class ImageProcessor
 {
     /// <summary>

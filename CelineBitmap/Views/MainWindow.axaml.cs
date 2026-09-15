@@ -27,9 +27,24 @@ public partial class MainWindow : Avalonia.Controls.Window
     // 슬라이더 이벤트가 계속 실행되는 것을 방지
     bool _updatingControls;
 
+    // 슬라이더 등이 움직일 때 너무 자주 이미지 전체를 다시 계산하지 않도록
+    // 잠깐 기다렸다가 마지막 값으로 한 번만 처리한다
+    readonly DispatcherTimer sliderDebounceTimer = new();
+
     public MainWindow()
     {
         InitializeComponent();
+
+        sliderDebounceTimer.Interval = TimeSpan.FromMilliseconds(100);
+
+        sliderDebounceTimer.Tick += (_, _) =>
+        {
+            // DispatcherTimer는 Start 후 계속 Tick하므로
+            // 이번 한 번 처리하고 정지한다
+            sliderDebounceTimer.Stop();
+
+            RebuildWorkingImage();
+        };
     }
 
     /// <summary>
@@ -338,7 +353,11 @@ public partial class MainWindow : Avalonia.Controls.Window
         if (_updatingControls) return;
         if (_originalImage is null) return;
 
-        RebuildWorkingImage();
+        // 이전 예약을 취소하고
+        sliderDebounceTimer.Stop();
+
+        // 마지막 변경 후 100ms가 지나면 실제 처리
+        sliderDebounceTimer.Start();
     }
 
     // 필터 버튼
@@ -404,6 +423,35 @@ public partial class MainWindow : Avalonia.Controls.Window
         _updatingControls = false;
 
         RebuildWorkingImage();
+    }
+
+    // 픽셀 아트 변환 버튼
+    void PixelArtButton_Click(object? sender, RoutedEventArgs e)
+    {
+        if (_workingImage is null || _workingImage.Empty()) return;
+
+        // 가로 픽셀 수 가져오기
+        int pixelWidth = (int)(PixelWidthInput.Value ?? 96);
+
+        // 사용할 색상 수 가져오기
+        int paletteColors =
+            PaletteColorCombo.SelectedIndex switch
+            {
+                0 => 8,
+                1 => 16,
+                2 => 32,
+                3 => 64,
+
+                _ => 32
+            };
+
+        bool smooth = PixelSmoothCheckBox.IsChecked == true;
+        Mat pixelArt = PixelArtProcessor.Create(_workingImage, pixelWidth, paletteColors, smooth);
+
+        // 기존 Working Image 정리
+        _workingImage.Dispose();
+        _workingImage = pixelArt;
+        UpdateAfterPreview();
     }
 
     /// <summary>
