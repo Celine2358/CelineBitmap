@@ -7,8 +7,8 @@
         x:DataType="vm:MainWindowViewModel"
 
         Title="Celine Bitmap"
-        Width="1100" Height="720"
-        MinWidth="850" MinHeight="560"
+        Width="1280" Height="720"
+        MinWidth="900" MinHeight="580"
         Icon="/Assets/CelineBitmap-Icon.ico"
         Background="{StaticResource CelineBackgroundBrush}"
         FontFamily="{StaticResource CelineFont}">
@@ -39,7 +39,7 @@
 
                 </StackPanel>
 
-                <Button Grid.Column="2" Content="Open Image" VerticalAlignment="Center" Click="OpenImageButton_Click"/>
+                <Button Grid.Column="2" Content="이미지 열기" VerticalAlignment="Center" Click="OpenImageButton_Click"/>
             </Grid>
         </Border>
 
@@ -49,32 +49,61 @@
               ColumnDefinitions="*,280"
               ColumnSpacing="16">
 
-            <!-- 이미지 미리보기 -->
+            <!-- 비포 / 애프터 이미지 미리보기 -->
             <Border Grid.Column="0" Background="White"
                     BorderBrush="{StaticResource CelineBorderBrush}"
                     BorderThickness="1"
                     CornerRadius="14"
-                    Padding="12">
+                    Padding="14">
                 
-                <Grid>
-                    <!-- 실제 이미지 -->
-                    <Image x:Name="PreviewImage" Stretch="Uniform"/>
+                <Grid RowDefinitions="Auto,*">
                     
-                    <!-- 이미지가 없을 때 보여주는 안내 -->
-                    <StackPanel x:Name="EmptyImageMessage"
-                                HorizontalAlignment="Center"
-                                VerticalAlignment="Center"
-                                Spacing="8">
+                    <TextBlock Grid.Row="0" Text="Image Preview"
+                               Margin="4,0,0,12"
+                               FontSize="15"
+                               FontWeight="SemiBold"
+                               Foreground="{StaticResource CelineTextBrush}"/>
+                    
+                    <Grid Grid.Row="1" ColumnDefinitions="*,*" ColumnSpacing="12">
                         
-                        <TextBlock Text="Celine Bitmap" FontSize="20"
-                                   HorizontalAlignment="Center"
-                                   Foreground="{StaticResource CelinePrimaryBrush}"/>
+                        <!-- Before -->
+                        <Grid Grid.Column="0" RowDefinitions="Auto,*">
+                            
+                            <TextBlock Text="Before"
+                                       Margin="4,0,0,6"
+                                       Foreground="{StaticResource CelineSubTextBrush}"/>
+                            
+                            <Border Grid.Row="1"
+                                    Background="#F8FBFF"
+                                    BorderBrush="{StaticResource CelineBorderBrush}"
+                                    BorderThickness="1"
+                                    CornerRadius="10"
+                                    Padding="8">
+
+                    <Image x:Name="BeforeImage" Stretch="Uniform"/>
+                </Border>
+            </Grid>
                         
-                        <TextBlock Text="이미지를 열어 작업을 시작하세요." FontSize="13"
-                                   Foreground="{StaticResource CelineSubTextBrush}"/>
-                    </StackPanel>
-                </Grid>
-            </Border>
+                        <!-- After -->
+                        <Grid Grid.Column="1" RowDefinitions="Auto,*">
+                            
+                            <TextBlock Text="After"
+                                       Margin="4,0,0,6"
+                                       Foreground="{StaticResource CelineSubTextBrush}"/>
+                            
+                            <Border Grid.Row="1"
+                                    Background="#F8FBFF"
+                                    BorderBrush="{StaticResource CelineBorderBrush}"
+                                    BorderThickness="1"
+                                    CornerRadius="10"
+                                    Padding="8">
+
+                    <Image x:Name="AfterImage" Stretch="Uniform"/>
+                </Border>
+            </Grid>
+        </Grid>
+    </Grid>
+</Border>
 
             <!-- 이미지 설정 도구 -->
             <Border Grid.Column="1"
@@ -83,36 +112,171 @@
                     BorderThickness="1"
                     CornerRadius="14"
                     Padding="18">
-
-                <StackPanel Spacing="12">
-                    <!-- 설정 패널 제목 -->
-                    <TextBlock Text="이미지 설정" FontSize="16" FontWeight="SemiBold" Foreground="{StaticResource CelineTextBrush}"/>
-
-                    <!-- 이미지 너비 설정 -->
-                    <TextBlock Text="너비(Width)" Foreground="{StaticResource CelineSubTextBrush}"/>
-
-                    <!-- NumericUpDown은 숫자를 입력 혹은 위/아래 화살표 버튼으로 값을 증가/감소시키는 입력 컨트롤 -->
-                    <NumericUpDown x:Name="WidthInput" Value="1024" Minimum="1" Maximum="16384"/>
-                    <!-- 이미지 높이 설정 -->
-                    <TextBlock Text="높이(Height)" Foreground="{StaticResource CelineSubTextBrush}"/>
-
-                    <NumericUpDown x:Name="HeightInput" Value="1024" Minimum="1" Maximum="16384"/>
-                    <!-- 이미지 크기 변경 시 사용할 보간법 -->
-                    <TextBlock Text="보간법(Interpolation)" Foreground="{StaticResource CelineSubTextBrush}"/>
-
-                    <!-- 보간법 선택 -->
-                    <ComboBox x:Name="InterpolationComboBox" SelectedIndex="0">
-                        <ComboBoxItem Content="Lanczos4"/>
-                        <ComboBoxItem Content="Cubic"/>
-                        <ComboBoxItem Content="Area"/>
-                        <ComboBoxItem Content="Nearest"/>
-                    </ComboBox>
-
-                    <!-- 설정한 Width / Height로 이미지 크기 변경 -->
-                    <Button Content="리사이즈" Margin="0,10,0,0" Click="ResizeButton_Click"/>
-                    <!-- 저장 버튼 -->
-                    <Button Content="이미지 저장" Click="SaveImageButton_Click"/>
-                </StackPanel>
+                
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel Spacing="10">
+                        
+                        <TextBlock Text="이미지 설정"
+                                   FontSize="16"
+                                   FontWeight="SemiBold"
+                                   Foreground="{StaticResource CelineTextBrush}"/>
+                        
+                        <!-- 원본 크기 -->
+                        <TextBlock Text="Original Size"
+                                   Foreground="{StaticResource CelineSubTextBrush}"/>
+                        
+                        <TextBlock x:Name="OriginalSizeText"
+                                   Text="No Image"
+                                   FontSize="15"
+                                   Foreground="{StaticResource CelineTextBrush}"/>
+                        
+                        <Border Height="1"
+                                Margin="0,6"
+                                Background="{StaticResource CelineBorderBrush}"/>
+                        
+                        <!-- Resize -->
+                        <TextBlock Text="리사이즈"
+                                   FontSize="14"
+                                   FontWeight="SemiBold"
+                                   Foreground="{StaticResource CelineTextBrush}"/>
+                        
+                        <!-- 이미지 너비 설정 -->
+                        <TextBlock Text="너비(Width)"
+                                   Foreground="{StaticResource CelineSubTextBrush}"/>
+                        
+                        <!-- NumericUpDown은 숫자를 입력 혹은 위/아래 화살표 버튼으로 값을 증가/감소시키는 입력 컨트롤 -->
+                        <!-- Value는 Decimal 자료형 -->
+                        <NumericUpDown x:Name="WidthInput"
+                                       Value="1024"
+                                       Minimum="1"
+                                       Maximum="16384"
+                                       ValueChanged="WidthInput_ValueChanged"/>
+                        
+                        <!-- 이미지 높이 설정 -->
+                        <TextBlock Text="높이(Height)"
+                                   Foreground="{StaticResource CelineSubTextBrush}"/>
+                        
+                        <NumericUpDown x:Name="HeightInput"
+                                       Value="1024"
+                                       Minimum="1"
+                                       Maximum="16384"
+                                       ValueChanged="HeightInput_ValueChanged"/>
+                        
+                        <!-- 비율 잠금 체크박스 -->
+                        <CheckBox x:Name="KeepAspectRatioCheckBox"
+                                  Content="이미지 비율 잠금"
+                                  IsChecked="True"/>
+                        
+                        <!-- 이미지 배율 정하기 -->
+                        <TextBlock Text="배율(Scale)"
+                                   Margin="0,4,0,0"
+                                   Foreground="{StaticResource CelineSubTextBrush}"/>
+                        
+                        <WrapPanel ItemSpacing="4" LineSpacing="4">
+                            <Button Content="25%"
+                                    Tag="0.25"
+                                    Click="ScaleButton_Click"/>
+                            
+                            <Button Content="50%"
+                                    Tag="0.5"
+                                    Click="ScaleButton_Click"/>
+                            
+                            <Button Content="100%"
+                                    Tag="1"
+                                    Click="ScaleButton_Click"/>
+                            
+                            <Button Content="200%"
+                                    Tag="2"
+                                    Click="ScaleButton_Click"/>
+                            
+                            <Button Content="400%"
+                                    Tag="4"
+                                    Click="ScaleButton_Click"/>
+                        
+                        </WrapPanel>
+                        <TextBlock Text="보간법(Interpolation)"
+                                   Foreground="{StaticResource CelineSubTextBrush}"/>
+                        
+                        <ComboBox x:Name="InterpolationComboBox" SelectedIndex="0">
+                            <ComboBoxItem Content="Lanczos4"/>
+                            <ComboBoxItem Content="Cubic"/>
+                            <ComboBoxItem Content="Area"/>
+                            <ComboBoxItem Content="Nearest"/>
+                        </ComboBox>
+                        
+                        <Button Content="Resize"
+                                Margin="0,4,0,0"
+                                Click="ResizeButton_Click"/>
+                        
+                        <Button Content="Reset Original"
+                                Click="ResetButton_Click"/>
+                        
+                        <Border Height="1"
+                                Margin="0,8"
+                                Background="{StaticResource CelineBorderBrush}"/>
+                        
+                        <!-- 이미지 실험실 -->
+                        <TextBlock Text="Image Laboratory"
+                                   FontSize="14"
+                                   FontWeight="SemiBold"
+                                   Foreground="{StaticResource CelineTextBrush}"/>
+                        
+                        <!-- 밝기 -->
+                        <TextBlock Text="밝기(Brightness)"
+                                   Foreground="{StaticResource CelineSubTextBrush}"/>
+                        
+                        <Slider x:Name="BrightnessSlider"
+                                Minimum="-100"
+                                Maximum="100"
+                                Value="0"
+                                TickFrequency="10"
+                                ValueChanged="ColorSlider_ValueChanged"/>
+                        
+                        <!-- 색 대비 -->
+                        <TextBlock Text="대비(Contrast)"
+                                   Foreground="{StaticResource CelineSubTextBrush}"/>
+                        
+                        <Slider x:Name="ContrastSlider"
+                                Minimum="0"
+                                Maximum="200"
+                                Value="100"
+                                TickFrequency="10"
+                                ValueChanged="ColorSlider_ValueChanged"/>
+                        
+                        <!-- 채도 -->
+                        <TextBlock Text="채도(Saturation)"
+                                   Foreground="{StaticResource CelineSubTextBrush}"/>
+                        
+                        <Slider x:Name="SaturationSlider"
+                                Minimum="0"
+                                Maximum="200"
+                                Value="100"
+                                TickFrequency="10"
+                                ValueChanged="ColorSlider_ValueChanged"/>
+                        
+                        <TextBlock Text="Filters"
+                                   Margin="0,6,0,0"
+                                   Foreground="{StaticResource CelineSubTextBrush}"/>
+                        
+                        <WrapPanel ItemSpacing="5" LineSpacing="5">
+                            <ToggleButton x:Name="GrayscaleToggle"
+                                          Content="Grayscale"
+                                          Click="FilterToggle_Click"/>
+                            
+                            <ToggleButton x:Name="BlurToggle"
+                                          Content="Blur"
+                                          Click="FilterToggle_Click"/>
+                            
+                            <ToggleButton x:Name="SharpenToggle"
+                                          Content="Sharpen"
+                                          Click="FilterToggle_Click"/>
+                            
+                            <ToggleButton x:Name="EdgeToggle"
+                                          Content="Edge"
+                                          Click="FilterToggle_Click"/>
+                        </WrapPanel>
+                    </StackPanel>
+                </ScrollViewer>
             </Border>
         </Grid>
     </Grid>
