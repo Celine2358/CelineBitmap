@@ -38,8 +38,14 @@
                                Foreground="{StaticResource CelineSubTextBrush}"/>
 
                 </StackPanel>
-
-                <Button Grid.Column="2" Content="이미지 열기" VerticalAlignment="Center" Click="OpenImageButton_Click"/>
+                
+                <StackPanel Grid.Column="2" Orientation="Horizontal"
+                            Spacing="8"
+                            VerticalAlignment="Center">
+                    
+                    <Button Content="이미지 열기" Click="OpenImageButton_Click"/>
+                    <Button x:Name="SaveImageButton" Content="이미지 저장" Click="SaveImageButton_Click" IsEnabled="False"/>
+                </StackPanel>
             </Grid>
         </Border>
 

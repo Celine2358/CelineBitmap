@@ -91,55 +91,52 @@ public static class ImageProcessor
     /// </summary>
     public static Mat AdjustSaturation(Mat source, double factor)
     {
-        var bgr = new Mat();
+        // Grayscale은 채도라는 개념이 없으므로 그대로 복사
+        if (source.Channels() == 1) return source.Clone();
 
-        // BGRA 이미지라면 일단 BGR로 변환!
-        if (source.Channels() == 4)
+        // BGR과 Alpha 값 분리
+        var (bgr, alpha) = SplitBgrAndAlpha(source);
+
+        try
         {
-            Cv2.CvtColor(source, bgr, ColorConversionCodes.BGRA2BGR);
+            using var hsv = new Mat();
+
+            // BGR -> HSV
+            Cv2.CvtColor(bgr, hsv, ColorConversionCodes.BGR2HSV);
+            Mat[] channels = Cv2.Split(hsv);
+
+            try
+            {
+                // channels[0] = 색상(Hue)
+                // channels[1] = 채도(Saturation)
+                // channels[2] = 명도(Value)
+                using var newSaturation = new Mat();
+
+                // S' = S × factor
+                channels[1].ConvertTo(newSaturation, channels[1].Type(), factor);
+                newSaturation.CopyTo(channels[1]);
+
+                // H + 수정된 S + V
+                Cv2.Merge(channels, hsv);
+            }
+            finally
+            {
+                foreach (Mat channel in channels) channel.Dispose();
+            }
+
+            using var adjustedBgr = new Mat();
+
+            // HSV -> BGR
+            Cv2.CvtColor(hsv, adjustedBgr, ColorConversionCodes.HSV2BGR);
+
+            // 원래 가지고 있던 Alpha를 다시 붙인다.
+            return MergeBgrAndAlpha(adjustedBgr, alpha);
         }
-        else
+        finally
         {
-            source.CopyTo(bgr);
+            bgr.Dispose();
+            alpha?.Dispose();
         }
-
-        var hsv = new Mat();
-
-        // BGR -> HSV
-        // Hue(색상), Saturation(채도), Value(명도)
-        Cv2.CvtColor(bgr, hsv, ColorConversionCodes.BGR2HSV);
-
-        // 세 가지 채널 H, S, V 각각 따로 분리하기
-        // 예를 들어 channels[0]에는 Hue 정보만 담긴 흑백 이미지
-        Mat[] channels = Cv2.Split(hsv);
-
-        // 채도를 조절할 빈 이미지 공간
-        var saturation = new Mat();
-
-        // 채도 값에 배수(factor)를 곱해 진하게 ~ 흐리게 만들기
-        // ConvertTo 함수는 채널의 데이터 형태를 바꿀때 사용
-        channels[1].ConvertTo(saturation, channels[1].Type(), factor);
-
-        // 메모리 누수를 방지하기 위해 기존의 원본 채도 이미지 channel[1]을 메모리에서 해제한다
-        channels[1].Dispose();
-
-        // 방금 factor를 곱해 새로 만든 채도 이미지
-        channels[1] = saturation;
-
-        // 분리된 채널들을 하나로 합치기
-        Cv2.Merge(channels, hsv);
-
-        // 다시 일반 이미지(BGR)로 되돌리기
-        var result = new Mat();
-        Cv2.CvtColor(hsv, result, ColorConversionCodes.HSV2BGR);
-
-        // OpenCV의 Mat 객체는 메모리를 계속 차지하게 된다
-        // 사용이 끝난 channels 배열 안의 이미지들, hsv, 원본 이미지를 모두 안전하게 해제한다
-        foreach (Mat channel in channels) channel.Dispose();
-        hsv.Dispose();
-        bgr.Dispose();
-
-        return result;
     }
 
     /// <summary>
@@ -264,6 +261,73 @@ public static class ImageProcessor
     public static WriteableBitmap ToBitmap(Mat image)
     {
         return image.ToWriteableBitmap();
+    }
+
+    /// <summary>
+    /// 입력 이미지를 BGR 색상 데이터와 Alpha 채널로 분리한다.
+    /// Alpha가 없는 이미지라면 alpha는 null.
+    /// </summary>
+    static (Mat bgr, Mat? alpha) SplitBgrAndAlpha(Mat source)
+    {
+        switch (source.Channels())
+        {
+            case 4:
+                {
+                    Mat[] channels = Cv2.Split(source);
+
+                    try
+                    {
+                        var bgr = new Mat();
+
+                        // B, G, R만 다시 하나의 3채널 이미지로 합친다.
+                        Cv2.Merge(new[] { channels[0], channels[1], channels[2] }, bgr);
+
+                        // Alpha는 색 보정에서 건드리지 않도록 따로 복사한다.
+                        Mat alpha = channels[3].Clone();
+
+                        return (bgr, alpha);
+                    }
+                    finally
+                    {
+                        foreach (Mat channel in channels) channel.Dispose();
+                    }
+                }
+
+            case 3:
+                return (source.Clone(), null);
+
+            case 1:
+                {
+                    var bgr = new Mat();
+                    Cv2.CvtColor(source, bgr, ColorConversionCodes.GRAY2BGR);
+
+                    return (bgr, null);
+                }
+
+            default:
+                throw new NotSupportedException($"지원하지 않는 채널 수입니다: {source.Channels()}");
+        }
+    }
+
+    /// <summary>
+    /// 처리된 BGR 이미지에 기존 Alpha 채널을 다시 결합한다.
+    /// </summary>
+    static Mat MergeBgrAndAlpha(Mat bgr, Mat? alpha)
+    {
+        // 원래 Alpha가 없었다면 BGR 그대로 반환
+        if (alpha is null) return bgr.Clone();
+        Mat[] channels = Cv2.Split(bgr);
+
+        try
+        {
+            var result = new Mat();
+            Cv2.Merge(new[] { channels[0], channels[1], channels[2], alpha }, result);
+            return result;
+        }
+        finally
+        {
+            foreach (Mat channel in channels) channel.Dispose();
+        }
     }
 
     /// <summary>

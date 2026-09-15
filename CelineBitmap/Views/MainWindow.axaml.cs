@@ -3,6 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform.Storage;
+using Avalonia.Threading;
 using CelineBitmap.Services;
 using OpenCvSharp;
 
@@ -279,10 +280,14 @@ public partial class MainWindow : Avalonia.Controls.Window
         // Saturation
         double saturation = SaturationSlider.Value / 100.0;
 
-        next = ImageProcessor.AdjustSaturation(result, saturation);
-
-        result.Dispose();
-        result = next;
+        // 100%는 원본과 동일하므로
+        // 불필요한 BGR -> HSV -> BGR 변환을 하지 않는다.
+        if (Math.Abs(saturation - 1.0) > 0.001)
+        {
+            next = ImageProcessor.AdjustSaturation(result, saturation);
+            result.Dispose();
+            result = next;
+        }
 
         // Blur
         if (BlurToggle.IsChecked == true)
