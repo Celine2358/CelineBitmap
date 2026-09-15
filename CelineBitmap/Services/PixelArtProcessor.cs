@@ -30,38 +30,82 @@ public static class PixelArtProcessor
         double ratio = (double)source.Height / source.Width;
         int pixelHeight = Math.Max(1, (int)Math.Round(pixelWidth * ratio));
 
-        // OpenCV 처리에 사용하기 위해 BGR 이미지로 변환
-        using Mat bgr = ConvertToBgr(source);
+        // 픽셀아트화에서 알파가 사라지는 것 수정
+        // BGR / Alpha 분리하기
+        Mat? alpha = null;
+        Mat bgr = new();
 
-        // 선택적으로 Bilateral Filter
-        // 작은 색 변화는 정리하면서
-        // 윤곽은 비교적 유지한다
-        using var preprocessed = new Mat();
-
-        if (smooth)
+        if (source.Channels() == 4)
         {
-            Cv2.BilateralFilter(bgr, preprocessed, 5, 40, 40);
+            // 이미지가 4채널(BGRA)인 경우, 각 채널을 분리한다
+            Mat[] channels = Cv2.Split(source);
+
+            // 색상 채널만 따로 합쳐서 bgr 변수에 저장한다
+            Cv2.Merge(new[] { channels[0], channels[1], channels[2] }, bgr);
+            // 4번째인 알파(투명) 채널을 alpha 변수에 복사해두기
+            alpha = channels[3].Clone();
+
+            // 분리에 사용된 임시 채널 메모리 해제
+            foreach (Mat channel in channels) channel.Dispose();
         }
         else
         {
-            bgr.CopyTo(preprocessed);
+            // 이미지에 알파가 없다면 BGR로 변환하여 사용
+            bgr = ConvertToBgr(source);
         }
 
-        // 저해상도 Pixel Grid로 축소
-        using var small = new Mat();
-        Cv2.Resize(preprocessed, small, new Size(pixelWidth, pixelHeight), 0, 0, InterpolationFlags.Area);
+        using (bgr)
+        {
+            using var preprocessed = new Mat();
 
-        // K-Means Color Quantization
-        // 수많은 색을 paletteColors개의 대표 색으로 묶는다
-        using Mat quantized = QuantizeKMeans(small, paletteColors);
+            // smooth 옵션이 켜져 있으면 BilateralFilter를 적용
+            if (smooth) Cv2.BilateralFilter(bgr, preprocessed, 5, 40, 40);
+            // 그렇지 않으면 원본 BGR 이미지를 그대로 전처리 이미지로 복사
+            else bgr.CopyTo(preprocessed);
 
-        // Nearest Neighbor로 확대
-        // 새로운 중간색을 만들지 않고
-        // 픽셀 블록을 그대로 확대한다
-        var result = new Mat();
-        Cv2.Resize(quantized, result, source.Size(), 0, 0, InterpolationFlags.Nearest);
+            using var small = new Mat();
+            // 이미지를 원하는 픽셀 아트 크기로 강제로 줄인다 (Area 보간)
+            Cv2.Resize(preprocessed, small, new Size(pixelWidth, pixelHeight), 0, 0, InterpolationFlags.Area);
 
-        return result;
+            // K-Means 알고리즘을 사용하여 지정된 팔레트 색상 수 만큼 색상 제한
+            using Mat quantized = QuantizeKMeans(small, paletteColors);
+            var resultBgr = new Mat();
+
+            Cv2.Resize(quantized, resultBgr, source.Size(), 0, 0, InterpolationFlags.Nearest);
+
+            // Alpha가 없으면 기존처럼 BGR 반환
+            if (alpha is null) return resultBgr;
+
+            using (alpha)
+            using (resultBgr)
+            {
+                // Alpha도 같은 픽셀 Grid로 변환
+                using var smallAlpha = new Mat();
+                Cv2.Resize(alpha, smallAlpha, new Size(pixelWidth, pixelHeight), 0, 0, InterpolationFlags.Area);
+
+                // 축소된 알파 채널을 다시 원본 크기로 확대 (도트 형태 유지)
+                using var largeAlpha = new Mat();
+                Cv2.Resize(smallAlpha, largeAlpha, source.Size(), 0, 0, InterpolationFlags.Nearest);
+
+                // BGR + Alpha 재결합
+                Mat[] channels = Cv2.Split(resultBgr);
+
+                try
+                {
+                    var result = new Mat();
+                    // 픽셀화된 BGR 채널들과, 똑같이 픽셀화한 알파(largeAlpha) 채널을
+                    // 하나로 합쳐 4채널(BGRA) 이미지를 만든다
+                    Cv2.Merge(new[] {channels[0], channels[1], channels[2], largeAlpha }, result);
+
+                    return result;
+                }
+                finally
+                {
+                    // 메모리 누수 방지
+                    foreach (Mat channel in channels) channel.Dispose();
+                }
+            }
+        }
     }
 
 
