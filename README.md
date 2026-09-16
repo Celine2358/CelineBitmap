@@ -16,11 +16,9 @@
 </p>
 
 이미지를 `Mat`으로 불러와 크기·색상·필터를 바꾸고, Before / After로 비교한 뒤 다시 저장합니다.
-OpenCV의 기본 연산을 익혀 2D Unity 제작 도구와 RainAI 웹캠 비전 기능으로 확장하기 위해 만들었습니다.
+OpenCV의 기본 연산을 익혀 2D Unity 제작 도구와 RainAI(ML.NET) 웹캠 비전 기능으로 확장하기 위해 만들었습니다.
 
-**개발자:** 이준빈 (Celine)
-
-> [프로젝트 포트폴리오 PDF 보기](./docs/portfolio/CelineBitmap_Portfolio.pdf)
+**개발자:** Celine
 
 ![CelineBitmap processing examples](./docs/images/celinebitmap-examples.png)
 
