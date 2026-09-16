@@ -16,9 +16,9 @@
 </p>
 
 이미지를 `Mat`으로 불러와 크기·색상·필터를 바꾸고, Before / After로 비교한 뒤 다시 저장합니다.
-OpenCV의 기본 연산을 익혀 2D Unity 제작 도구와 RainAI(ML.NET) 웹캠 비전 기능으로 확장하기 위해 만들었습니다.
-
-**개발자:** Celine
+<br>
+OpenCV의 기본 연산을 익혀 2D Unity 제작 도구와
+RainAI(ML.NET) 웹캠 비전 기능으로 확장하기 위해 만들었습니다.
 
 ![CelineBitmap processing examples](./docs/images/celinebitmap-examples.png)
 
@@ -36,7 +36,6 @@ OpenCV의 기본 연산을 익혀 2D Unity 제작 도구와 RainAI(ML.NET) 웹�
 | --- | --- |
 | ![Character pixel art example](./docs/images/celinebitmap-pixelart-bodynica.png) | ![Water orb pixel art workflow](./docs/images/celinebitmap-water-orb-workflow.png) |
 
-제공된 실제 작업 자료와 처리 조건은 포트폴리오 PDF의 32~37쪽 사례 부록에 정리했습니다.
 
 ## 주요 기능
 
@@ -114,26 +113,12 @@ CelineBitmap/
 │  └─ Views/
 │     ├─ MainWindow.axaml      # Before / After UI
 │     └─ MainWindow.axaml.cs   # 상태, 이벤트, debounce, Dispose
-├─ docs/images/                # 재현 가능한 포트폴리오 예시 이미지
-└─ docs/portfolio/             # 프로젝트 포트폴리오 PDF
+├─ docs/images/                # 재현 가능한 예시 이미지
 ```
 
 ## 실행
 
 필요 환경: [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0), Windows x64
-
-```powershell
-git clone https://github.com/Celine2358/CelineBitmap.git
-cd CelineBitmap
-dotnet restore .\CelineBitmap\CelineBitmap.slnx
-dotnet run --project .\CelineBitmap\CelineBitmap.csproj
-```
-
-Release 빌드:
-
-```powershell
-dotnet build .\CelineBitmap\CelineBitmap.slnx -c Release
-```
 
 ## 코드 예시
 
@@ -150,16 +135,6 @@ Cv2.ImWrite("CelineBitmap_Output.png", resized);
 
 핵심 코드는 [ImageProcessor.cs](./CelineBitmap/Services/ImageProcessor.cs), [PixelArtProcessor.cs](./CelineBitmap/Services/PixelArtProcessor.cs), [MainWindow.axaml.cs](./CelineBitmap/Views/MainWindow.axaml.cs)에서 볼 수 있습니다.
 
-## 현재 상태와 다음 단계
-
-- Release 빌드는 성공합니다. 현재 `PixelArtProcessor.cs`의 nullable 분석 경고 1개가 남아 있습니다.
-- 자동 테스트 프로젝트는 아직 없습니다.
-- 초소형 이미지와 `Palette Colors > 축소된 픽셀 수` 입력에는 추가 방어가 필요합니다.
-- Pixel Art를 일반 조정 파이프라인의 상태로 통합하면 반복 적용과 슬라이더 재계산 동작이 더 일관됩니다.
-- 다음 프로젝트에서는 ABKO APC850 웹캠을 사용해 `VideoCapture → 얼굴 검출 → 정렬 → 임베딩 → 유사도 비교 → 여러 프레임 안정화` 순서로 RainAI 얼굴 인식을 실험할 예정입니다.
-- 사전학습 YuNet/SFace baseline 이후에는 여러 촬영 세션의 얼굴 embedding으로 개인화 분류와 `Unknown` 임계값을 학습·보정하는 것이 목표입니다.
-
-얼굴 데이터는 로컬 저장·삭제 정책과 사용자 동의를 먼저 정하고, 오인식보다 `Unknown` 판정을 우선하는 방향으로 설계합니다.
 
 ## 참고
 
