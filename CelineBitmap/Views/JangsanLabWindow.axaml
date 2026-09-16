@@ -1,0 +1,132 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="CelineBitmap.Views.JangsanLabWindow"
+
+        Title="Celine Bitmap - Jangsan Vision Lab"
+        Width="1000" Height="700"
+        MinWidth="860" MinHeight="600"
+        Background="{StaticResource CelineBackgroundBrush}"
+        FontFamily="{StaticResource CelineFont}"
+        Icon="/Assets/CelineBitmap-Icon.ico">
+
+    <Grid RowDefinitions="64,*,48">
+
+        <!-- UI 상단 -->
+        <Border Grid.Row="0"
+                Background="White"
+                BorderBrush="{StaticResource CelineBorderBrush}"
+                BorderThickness="0,0,0,1"
+                Padding="20,10">
+
+            <StackPanel>
+                <TextBlock Text="Jangsan Vision Lab" FontSize="18"
+                           FontWeight="SemiBold"
+                           Foreground="{StaticResource CelineTextBrush}"/>
+
+                <TextBlock Text="OpenCV Webcam Vector Experiment" FontSize="11"
+                           Foreground="{StaticResource CelineSubTextBrush}"/>
+            </StackPanel>
+        </Border>
+
+        <!-- 작업 공간 -->
+        <Grid Grid.Row="1"
+              Margin="18"
+              ColumnDefinitions="*,260"
+              ColumnSpacing="14">
+
+            <!-- 웹캠 입력 공간 -->
+            <Border Grid.Column="0" Background="#1B232C"
+                    CornerRadius="14" ClipToBounds="True">
+                <Grid>
+                    <Image x:Name="CameraPreview" Stretch="Uniform"/>
+
+                    <!-- 얼굴을 이 안에 맞춘다 -->
+                    <Border Width="260" Height="260"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            BorderBrush="#7FC8FF"
+                            BorderThickness="3"
+                            CornerRadius="18"
+                            IsHitTestVisible="False"/>
+
+                    <TextBlock Text="장산이 얼굴을 중앙 박스에 맞춰!"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Bottom"
+                               Margin="0,0,0,18"
+                               FontSize="12"
+                               Foreground="White"/>
+                </Grid>
+            </Border>
+
+            <!-- 오른쪽 세팅 UI -->
+            <Border Grid.Column="1"
+                    Background="White"
+                    BorderBrush="{StaticResource CelineBorderBrush}"
+                    BorderThickness="1"
+                    CornerRadius="14"
+                    Padding="16">
+
+                <StackPanel Spacing="10">
+                    <TextBlock Text="Webcam"
+                               FontSize="15"
+                               FontWeight="SemiBold"
+                               Foreground="{StaticResource CelineTextBrush}"/>
+
+                    <TextBlock x:Name="CameraStatusText"
+                               Text="Stopped"
+                               Foreground="{StaticResource CelineSubTextBrush}"/>
+
+                    <Button Content="카메라 시작" Click="StartCameraButton_Click"/>
+                    <Button Content="카메라 정지" Click="StopCameraButton_Click"/>
+
+                    <Border Height="1" Margin="0,6" Background="{StaticResource CelineBorderBrush}"/>
+
+                    <TextBlock Text="장산이의 Vector"
+                               FontSize="15"
+                               FontWeight="SemiBold"
+                               Foreground="{StaticResource CelineTextBrush}"/>
+
+                    <TextBlock x:Name="VectorStatusText"
+                               Text="아직 데이터가 없습니다."
+                               TextWrapping="Wrap"
+                               Foreground="{StaticResource CelineSubTextBrush}"/>
+
+                    <Button Content="얼굴 벡터 추출" Click="ExtractVectorButton_Click"/>
+
+                    <Border Height="1"
+                            Margin="0,6"
+                            Background="{StaticResource CelineBorderBrush}"/>
+
+                    <Button Content="저장 폴더 선택" Click="SelectFolderButton_Click"/>
+
+                    <TextBlock x:Name="FolderText"
+                               Text="저장 폴더 없음"
+                               TextWrapping="Wrap"
+                               FontSize="11"
+                               Foreground="{StaticResource CelineSubTextBrush}"/>
+
+                    <!-- Vector가 있고 저장 폴더까지 골라야 활성화 -->
+                    <Button x:Name="SaveDataButton"
+                            Content="데이터 저장"
+                            IsEnabled="False"
+                            Click="SaveDataButton_Click"/>
+
+                </StackPanel>
+            </Border>
+        </Grid>
+
+
+        <!-- 상태 창 UI -->
+        <Border Grid.Row="2"
+                Background="White"
+                BorderBrush="{StaticResource CelineBorderBrush}"
+                BorderThickness="0,1,0,0"
+                Padding="18,0">
+
+            <TextBlock x:Name="StatusText"
+                       Text="웹캠을 연결하고 카메라를 시작하세요"
+                       VerticalAlignment="Center"
+                       Foreground="{StaticResource CelineSubTextBrush}"/>
+        </Border>
+    </Grid>
+</Window>

@@ -45,6 +45,7 @@
                     
                     <Button Content="이미지 열기" Click="OpenImageButton_Click"/>
                     <Button x:Name="SaveImageButton" Content="이미지 저장" Click="SaveImageButton_Click" IsEnabled="True"/>
+                    <Button Content="실험실" Click="OpenLabButton_Click"/>
                 </StackPanel>
             </Grid>
         </Border>

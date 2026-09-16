@@ -454,6 +454,13 @@ public partial class MainWindow : Avalonia.Controls.Window
         UpdateAfterPreview();
     }
 
+    // 실험실 열기 버튼
+    void OpenLabButton_Click(object? sender, RoutedEventArgs e)
+    {
+        var labWindow = new JangsanLabWindow();
+        labWindow.Show();
+    }
+
     /// <summary>
     /// 프로그램을 닫을 때
     /// OpenCV / Avalonia Native 리소스를 정리한다
